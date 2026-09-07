@@ -31,6 +31,7 @@ what the keys actually do.
 | `Ctrl+K` | command palette — tabs, history, actions |
 | `Ctrl+L` | address — a URL or a search |
 | `Ctrl+/` | every binding, as a sheet |
+| `Ctrl+D` | bookmark this page, or remove it |
 | `Ctrl+T` / `Ctrl+W` | new tab / close tab |
 | `Ctrl+1…9`, `Ctrl+Tab` | jump to a tab, cycle |
 | `Alt+←` `Alt+→`, `Ctrl+R` | back, forward, reload |
@@ -47,10 +48,15 @@ src/main/tabs.js        one WebContentsView per tab
 src/main/shortcuts.js   every binding, and the legend generated from it
 src/main/blocker.js     request blocking, referrer trimming, permissions
 src/main/dns.js         DNS-over-HTTPS, scoped to this browser only
+src/main/bookmarks.js   the one thing that persists, as a JSON file
 src/preload/chrome.js   the entire API the UI is allowed to call
 src/chrome/             the UI — plain HTML/CSS/JS, no build step
 designs/                the five directions this was chosen from
 ```
+
+Bookmarks are pushed into the new tab page one-way, with `executeJavaScript`.
+Every tab shares one `webPreferences`, so giving that page a preload would hand
+the same API to every website it later navigates to.
 
 The chrome holds no browser logic: it renders whatever arrives on `onTabs` and
 calls back through `window.browser`. `src/chrome/` can be rewritten in anything
@@ -88,6 +94,7 @@ observer, it moves it to your ISP.
 
 - No context menu — Electron ships none, and right-click currently does nothing
 - No find-in-page
-- Tabs and history are in-memory; they do not survive a restart
+- Tabs and history are in-memory; they do not survive a restart. Bookmarks do —
+  they live in `bookmarks.json` under the app's userData directory
 - No zoom
 - If the DoH resolver is unreachable nothing resolves, with no message saying so

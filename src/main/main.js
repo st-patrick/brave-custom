@@ -7,6 +7,7 @@ const { TabManager, NEW_TAB_URL } = require('./tabs')
 const { installBlocker } = require('./blocker')
 const { configureDns } = require('./dns')
 const shortcuts = require('./shortcuts')
+const bookmarks = require('./bookmarks')
 
 /**
  * Overlay scrollbars: they float over the content, fade out when idle and take
@@ -84,6 +85,7 @@ function createWindow() {
     dockView.webContents.send('window:state', windowState())
     dockView.webContents.send('keys:legend', shortcuts.legend())
     dockView.webContents.send('history:state', history)
+    dockView.webContents.send('bookmarks:state', bookmarks.list())
     if (tabs) dockView.webContents.send('tabs:state', tabs.snapshot())
   })
 
@@ -112,6 +114,9 @@ function bindShortcuts(wc) {
   wc.on('before-input-event', (event, input) => {
     if (shortcuts.handle(input, ctx())) event.preventDefault()
   })
+  wc.on('did-finish-load', () => {
+    if (wc.getURL() === NEW_TAB_URL) pushBookmarksTo(wc)
+  })
 }
 
 function ctx() {
@@ -120,6 +125,7 @@ function ctx() {
     tabs,
     openPalette,
     quit: () => app.quit(),
+    toggleBookmark,
     reloadChromeUi,
     dockDevTools: () => dockView.webContents.toggleDevTools({ mode: 'detach' }),
   }
@@ -162,6 +168,36 @@ function applyLayout() {
 
   // Truly full-bleed: nothing displaces the page.
   tabs.setPageBounds({ x: 0, y: 0, width, height })
+}
+
+// -- bookmarks ----------------------------------------------------------------
+
+/** Bookmarks the active tab, or un-bookmarks it if it already is one. */
+function toggleBookmark() {
+  const tab = tabs && tabs.active()
+  if (!tab || tab.url === NEW_TAB_URL) return
+  bookmarks.toggle(tab.url, tab.title)
+  send('bookmarks:state', bookmarks.list())
+  refreshNewTabPages()
+}
+
+/**
+ * The new tab page runs with no preload -- every tab shares one webPreferences,
+ * and handing a bookmarks API to every website would be reckless. So the list is
+ * pushed in one-way instead, by calling a function the page defines.
+ */
+function pushBookmarksTo(wc) {
+  if (wc.isDestroyed()) return
+  wc.executeJavaScript(
+    'window.renderBookmarks && window.renderBookmarks(' + JSON.stringify(bookmarks.list()) + ')',
+  ).catch(() => {})
+}
+
+function refreshNewTabPages() {
+  if (!tabs) return
+  for (const t of tabs.tabs.values()) {
+    if (t.url === NEW_TAB_URL) pushBookmarksTo(t.view.webContents)
+  }
 }
 
 // -- history ------------------------------------------------------------------
@@ -220,6 +256,13 @@ function registerIpc() {
     applyLayout()
   })
 
+  ipcMain.on('bookmark:toggle', toggleBookmark)
+  ipcMain.on('bookmark:remove', (_e, url) => {
+    bookmarks.remove(url)
+    send('bookmarks:state', bookmarks.list())
+    refreshNewTabPages()
+  })
+
   ipcMain.on('palette:open', (_e, mode) => openPalette(mode))
   ipcMain.on('palette:close', closePalette)
 
@@ -265,6 +308,7 @@ app.whenReady().then(() => {
   // natively inside editable fields, they were never coming from the menu.
   Menu.setApplicationMenu(null)
 
+  bookmarks.load()
   dns = configureDns(app)
   console.log(`DNS: ${dns.label} (${dns.note})${dns.secure ? ' over HTTPS' : ''}`)
 

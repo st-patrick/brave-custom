@@ -31,6 +31,10 @@ contextBridge.exposeInMainWorld('browser', {
   // dock geometry: main owns the view rect, so hover has to round-trip
   setDockHover: (on) => ipcRenderer.send('dock:hover', on),
 
+  // bookmarks
+  toggleBookmark: () => ipcRenderer.send('bookmark:toggle'),
+  removeBookmark: (url) => ipcRenderer.send('bookmark:remove', url),
+
   // command palette
   openPalette: (mode) => ipcRenderer.send('palette:open', mode || 'all'),
   closePalette: () => ipcRenderer.send('palette:close'),
@@ -45,6 +49,7 @@ contextBridge.exposeInMainWorld('browser', {
   // events
   onTabs: on('tabs:state'),
   onHistory: on('history:state'),
+  onBookmarks: on('bookmarks:state'),
   onWindow: on('window:state'),
   onKeys: on('keys:legend'),
   onPaletteOpen: on('palette:open'),

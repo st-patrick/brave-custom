@@ -78,6 +78,7 @@ function renderSheet() {
 
 let state = { tabs: [], activeId: null }
 let history = []
+let marks = []
 let mode = 'all'
 let rows = [] // the flattened, filtered result list
 let cursor = 0
@@ -144,6 +145,7 @@ $('pill').addEventListener('click', () => browser.openPalette('url'))
 
 const ACTIONS = [
   { label: 'New tab', key: keyLabel('⌘T'), run: () => browser.newTab() },
+  { label: 'BOOKMARK', key: keyLabel('⌘D'), run: () => browser.toggleBookmark() },
   { label: 'Close this tab', key: keyLabel('⌘W'), run: () => browser.closeTab() },
   { label: 'Reload', key: keyLabel('⌘R'), run: () => browser.reload() },
   { label: 'Copy page address', key: '', run: () => {
@@ -220,6 +222,18 @@ function build(q) {
   }
 
   const openUrls = new Set(state.tabs.map((t) => t.url))
+
+  for (const b of marks) {
+    if (!match(b.title) && !match(b.url)) continue
+    out.push({
+      sect: 'Bookmarks',
+      title: b.title,
+      hint: shortUrl(b.url),
+      star: true,
+      run: (newTab) => (newTab ? browser.newTab(b.url) : browser.navigate(b.url)),
+    })
+  }
+
   for (const h of history) {
     if (openUrls.has(h.url)) continue
     if (!match(h.title) && !match(h.url)) continue
@@ -232,9 +246,16 @@ function build(q) {
     if (out.filter((r) => r.sect === 'History').length >= 8) break
   }
 
+  const tab = activeTab()
+  const saved = !!tab && marks.some((b) => b.url === tab.url)
   for (const a of ACTIONS) {
-    if (!match(a.label)) continue
-    out.push({ sect: 'Actions', title: a.label, key: a.key, accent: true, run: a.run, keepOpen: a.keepOpen })
+    let label = a.label
+    if (label === 'BOOKMARK') {
+      if (!tab || tab.isNewTab) continue
+      label = saved ? 'Remove bookmark' : 'Bookmark this page'
+    }
+    if (!match(label)) continue
+    out.push({ sect: 'Actions', title: label, key: a.key, accent: true, run: a.run, keepOpen: a.keepOpen })
   }
 
   return out
@@ -261,7 +282,9 @@ function render() {
     const el = document.createElement('div')
     el.className = 'item' + (i === cursor ? ' on' : '')
 
-    if (row.favicon) {
+    if (row.star) {
+      el.appendChild(star())
+    } else if (row.favicon) {
       const img = document.createElement('img')
       img.className = 'ico'
       img.src = row.favicon
@@ -302,6 +325,14 @@ function render() {
 
   const on = list.querySelector('.item.on')
   if (on) on.scrollIntoView({ block: 'nearest' })
+}
+
+function star() {
+  const s = document.createElement('span')
+  s.className = 'ico star'
+  s.innerHTML =
+    '<svg viewBox="0 0 16 16"><path d="M8 2.2l1.8 3.7 4 .6-2.9 2.8.7 4L8 11.4l-3.6 1.9.7-4L2.2 6.5l4-.6z"/></svg>'
+  return s
 }
 
 function swatch(accent) {
@@ -379,6 +410,11 @@ browser.onTabs((next) => {
 
 browser.onHistory((next) => {
   history = next
+  if (document.body.classList.contains('palette')) refresh()
+})
+
+browser.onBookmarks((next) => {
+  marks = next || []
   if (document.body.classList.contains('palette')) refresh()
 })
 

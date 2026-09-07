@@ -36,6 +36,9 @@ const BINDINGS = [
     if (id != null) c.tabs.activate(id)
   } },
 
+  // -- bookmarks --------------------------------------------------------------
+  { group: 'Bookmarks', keys: 'Mod+D', label: 'Bookmark this page, or remove it', short: 'bookmark', run: (c) => c.toggleBookmark() },
+
   // -- window -----------------------------------------------------------------
   // There is no title bar and no drag region, so the window is moved by key.
   { group: 'Window', keys: 'Mod+Alt+Left', label: 'Move window left', run: (c) => move(c, -MOVE_STEP, 0) },
