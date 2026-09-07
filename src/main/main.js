@@ -8,6 +8,26 @@ const { installBlocker } = require('./blocker')
 const { configureDns } = require('./dns')
 const shortcuts = require('./shortcuts')
 
+/**
+ * Overlay scrollbars: they float over the content, fade out when idle and take
+ * no layout width. A permanently parked grey gutter down the right edge is the
+ * one piece of chrome this design cannot remove from inside the page, so it is
+ * removed from under it instead. Must be set before the app is ready.
+ */
+app.commandLine.appendSwitch('enable-features', 'FluentOverlayScrollbar,FluentScrollbars,OverlayScrollbar')
+
+/**
+ * Electron appends "<appName>/<version> ... Electron/<version>" to the user
+ * agent. That leaks the shell to every site, and with this app named
+ * "brave-custom" it also made Lobsters serve its block page, because their
+ * Brave filter matches the substring. Strip both tokens so we present as the
+ * plain Chrome we actually are.
+ */
+app.userAgentFallback = app.userAgentFallback
+  .split(' ' + app.getName() + '/' + app.getVersion())
+  .join('')
+  .replace(/\s*Electron\/[\d.]+/i, '')
+
 const DEV = process.argv.includes('--dev') || !app.isPackaged
 const CHROME_DIR = path.join(__dirname, '../chrome')
 const PRELOAD = path.join(__dirname, '../preload/chrome.js')

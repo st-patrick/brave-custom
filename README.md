@@ -70,6 +70,10 @@ view's own bounds.
   the pill's shield. This is the seam where EasyList would go.
 - Cross-site referrers trimmed to the origin; identifying client-hint headers
   dropped.
+- The Electron and app-name tokens are stripped from the user agent, so it
+  presents as plain Chrome. Less to fingerprint — and it stops sites that filter
+  on the shell's name from serving a block page.
+- Overlay scrollbars, so no permanently parked gutter down the right edge.
 - Site permissions denied by default — there is no prompt UI yet, and a silent
   deny beats a silent grant.
 - DNS-over-HTTPS in `secure` mode (no cleartext fallback, ever), defaulting to
