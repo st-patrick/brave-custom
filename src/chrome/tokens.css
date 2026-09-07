@@ -1,0 +1,74 @@
+/* =============================================================================
+   Shared design tokens for every chrome surface. Retheme the browser here.
+   Both chrome views and the new tab page link this file; edits hot-reload.
+   ========================================================================== */
+:root {
+  /* surfaces */
+  --bg: #0b0b0e;
+  --panel: #101015;
+  --panel-2: #16161d;
+  --hover: #1c1c25;
+  --line: #23232d;
+
+  /* ink */
+  --fg: #ededf2;
+  --dim: #9a9aa8;
+  --faint: #5b5b68;
+  --ghost: #3d3d47;
+
+  /* meaning */
+  --accent: #f0653a;
+  --secure: #4d9a71;
+
+  /* shape */
+  --r-sm: 6px;
+  --r: 10px;
+  --r-lg: 14px;
+  --pill: 999px;
+
+  /* type */
+  --sans: "Inter var", Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  /* depth */
+  /* Kept small on purpose: the dock view clips anything that reaches its
+     own edge, so the blur has to fit inside DOCK.collapsed in main.js. */
+  --shadow-pill: 0 1px 2px rgb(0 0 0 / 0.26), 0 4px 16px rgb(0 0 0 / 0.34);
+  --shadow-panel: 0 30px 90px rgb(0 0 0 / 0.62);
+}
+
+/* The chrome is a dark HUD on purpose -- it has to read over any page, light
+   or dark. Only the light-mode nudge below keeps it from looking heavy on a
+   white page; the palette stays dark either way. */
+@media (prefers-color-scheme: light) {
+  :root {
+    --shadow-pill: 0 1px 2px rgb(0 0 0 / 0.14), 0 4px 16px rgb(0 0 0 / 0.20);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  /* Transparent so the page shows through wherever the UI paints nothing. */
+  background: transparent;
+  font: 13px/1.5 var(--sans);
+  color: var(--fg);
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
+}
+
+kbd {
+  font: 500 10.5px/1 var(--mono);
+  padding: 3.5px 6px;
+  border-radius: var(--r-sm);
+  background: rgb(255 255 255 / 0.09);
+  border: 1px solid rgb(255 255 255 / 0.07);
+  color: var(--fg);
+  white-space: nowrap;
+}

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Hotkey HUD — browser chrome direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<script type="application/json" id="design-meta">
+{
+  "id": "02-hotkey-hud",
+  "title": "Hotkey HUD",
+  "direction": "The tack idea taken all the way: no clickable toolbar at all, a persistent legend of keys instead.",
+  "medium": "browser-chrome",
+  "theme": "dark",
+  "refs": ["26716139"],
+  "tags": ["mono", "dense", "keyboard-first", "terminal", "hotkey-legend"],
+  "architecture": "top strip, same as today — but the second row is a legend, not buttons"
+}
+</script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font: 13px/1.5 Inter, system-ui, sans-serif;
+    background: #0a0a0c; color: #e6e6ea;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+  /* ---- chrome ----------------------------------------------------------- */
+  .chrome { flex: none; border-bottom: 1px solid #1c1c22; background: #0d0d10; }
+
+  .tabs { display: flex; align-items: stretch; height: 34px; }
+  .tab {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 14px; min-width: 0; max-width: 210px;
+    border-right: 1px solid #17171d;
+    font-family: "JetBrains Mono", monospace; font-size: 11.5px;
+    color: #6a6a77; white-space: nowrap;
+  }
+  .tab .n { color: #35353f; }
+  .tab.on { background: #14141a; color: #e6e6ea; box-shadow: inset 0 -2px 0 #f0653a; }
+  .tab .dot { width: 6px; height: 6px; border-radius: 50%; background: #2f2f38; flex: none; }
+  .tab.on .dot { background: #f0653a; }
+  .tabs .grow { flex: 1; border-right: 0; }
+
+  .urlrow {
+    display: flex; align-items: center; gap: 12px;
+    height: 40px; padding: 0 14px;
+    font-family: "JetBrains Mono", monospace; font-size: 12.5px;
+  }
+  .sec { color: #4e9c72; }
+  .url { flex: 1; min-width: 0; letter-spacing: -0.01em; }
+  .url b { color: #fff; font-weight: 500; }
+  .url span { color: #5c5c68; }
+  .stat { color: #f0653a; font-size: 11px; }
+
+  /* The legend IS the toolbar. Nothing here is clickable by design. */
+  .legend {
+    display: flex; align-items: center; gap: 0;
+    height: 28px; padding: 0 12px;
+    border-top: 1px solid #16161c;
+    background: #0a0a0d;
+    font-family: "JetBrains Mono", monospace; font-size: 10.5px;
+    color: #55555f; overflow: hidden;
+  }
+  .legend i { font-style: normal; padding: 0 11px; border-right: 1px solid #17171d; white-space: nowrap; }
+  .legend i:last-child { border-right: 0; margin-left: auto; color: #8a8a96; }
+  .legend b { color: #c9c9d4; font-weight: 500; }
+  .legend em { font-style: normal; color: #6f6f7c; }
+
+  /* ---- page ------------------------------------------------------------- */
+  .page { flex: 1; overflow: hidden; background: #f7f7f5; color: #16161a; padding: 42px 56px; }
+  .page h1 { font: 600 27px/1.25 Inter; letter-spacing: -0.02em; margin: 0 0 8px; }
+  .page .sub { color: #6f6e6a; margin-bottom: 26px; font-size: 13.5px; }
+  .rows { border-top: 1px solid #e6e5e1; }
+  .row {
+    display: grid; grid-template-columns: 74px 1fr auto;
+    gap: 20px; align-items: baseline;
+    padding: 13px 0; border-bottom: 1px solid #e6e5e1;
+  }
+  .row .t { font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: #a3a29d; }
+  .row .h { font-weight: 500; }
+  .row .d { color: #78776f; font-size: 12.5px; margin-top: 2px; }
+  .row .v { font-family: "JetBrains Mono", monospace; font-size: 12px; color: #16161a; }
+  .row .v.up { color: #b3462f; }
+</style>
+</head>
+<body>
+  <div class="chrome">
+    <div class="tabs">
+      <div class="tab on"><span class="dot"></span><span class="n">1</span> lobste.rs</div>
+      <div class="tab"><span class="dot"></span><span class="n">2</span> sourcehut.org</div>
+      <div class="tab"><span class="dot"></span><span class="n">3</span> mullvad.net</div>
+      <div class="tab grow"></div>
+    </div>
+
+    <div class="urlrow">
+      <span class="sec">https</span>
+      <span class="url"><b>lobste.rs</b><span>/t/programming</span></span>
+      <span class="stat">4 blocked</span>
+    </div>
+
+    <div class="legend">
+      <i><b>⌘L</b> <em>address</em></i>
+      <i><b>⌘T</b> <em>tab</em></i>
+      <i><b>⌘W</b> <em>close</em></i>
+      <i><b>⌘1-9</b> <em>jump</em></i>
+      <i><b>⌘[ ]</b> <em>back fwd</em></i>
+      <i><b>⌘R</b> <em>reload</em></i>
+      <i><b>⌘K</b> <em>command</em></i>
+      <i><b>?</b> <em>all keys</em></i>
+    </div>
+  </div>
+
+  <div class="page">
+    <h1>Programming</h1>
+    <div class="sub">243 stories · sorted by hotness</div>
+    <div class="rows">
+      <div class="row">
+        <div class="t">4h ago</div>
+        <div>
+          <div class="h">Writing a browser engine in 2000 lines of Zig</div>
+          <div class="d">zigmonthly.org · 61 comments</div>
+        </div>
+        <div class="v up">218</div>
+      </div>
+      <div class="row">
+        <div class="t">7h ago</div>
+        <div>
+          <div class="h">The case against ambient background sync</div>
+          <div class="d">tobi.sh · 34 comments</div>
+        </div>
+        <div class="v">147</div>
+      </div>
+      <div class="row">
+        <div class="t">11h ago</div>
+        <div>
+          <div class="h">SQLite as an application file format, ten years on</div>
+          <div class="d">notes.pinboard.io · 88 comments</div>
+        </div>
+        <div class="v">132</div>
+      </div>
+      <div class="row">
+        <div class="t">14h ago</div>
+        <div>
+          <div class="h">Why your DNS resolver sees less than you think</div>
+          <div class="d">mullvad.net/blog · 19 comments</div>
+        </div>
+        <div class="v">96</div>
+      </div>
+      <div class="row">
+        <div class="t">1d ago</div>
+        <div>
+          <div class="h">Rewriting the tab strip: a postmortem</div>
+          <div class="d">bl.ocks.dev · 12 comments</div>
+        </div>
+        <div class="v">71</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

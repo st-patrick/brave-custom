@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Tinted Frame — browser chrome direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script type="application/json" id="design-meta">
+{
+  "id": "04-tinted-frame",
+  "title": "Tinted Frame",
+  "direction": "The chrome adopts the page's theme-colour. Soft gradient tab pills, hostname/path split in the URL.",
+  "medium": "browser-chrome",
+  "theme": "light",
+  "refs": ["27248035"],
+  "tags": ["adaptive", "soft", "gradient", "theme-color", "playful"],
+  "architecture": "read <meta name=theme-color> per tab, push it to the chrome UI as a CSS variable"
+}
+</script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    /* The single variable the whole frame reacts to. */
+    --tint: #16a34a;
+    --tint-wash: #eaf7ee;
+    font: 14px/1.55 "Plus Jakarta Sans", system-ui, sans-serif;
+    color: #10231a;
+    background: #fff;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* ---- chrome ----------------------------------------------------------- */
+  .chrome {
+    flex: none;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--tint) 20%, #fff) 0%, var(--tint-wash) 62%, #fff 100%);
+    padding: 8px 12px 12px;
+  }
+
+  .toprow { display: flex; align-items: flex-end; gap: 6px; height: 38px; }
+
+  .tab {
+    display: flex; align-items: center; gap: 9px;
+    height: 34px; padding: 0 13px; min-width: 0; max-width: 230px;
+    border-radius: 11px 11px 4px 4px;
+    font-size: 13px; font-weight: 500; color: #4c6157;
+    white-space: nowrap; overflow: hidden;
+  }
+  .tab .fav { width: 15px; height: 15px; border-radius: 50%; flex: none; }
+  .tab.on {
+    background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.72));
+    color: #10231a;
+    box-shadow: 0 1px 2px rgba(16,35,26,.09), inset 0 1px 0 rgba(255,255,255,.9);
+  }
+  .newtab {
+    display: grid; place-items: center; width: 32px; height: 32px;
+    border-radius: 10px; background: rgba(255,255,255,.5);
+    color: #3f5b4c; font-size: 17px; font-weight: 400;
+  }
+  .wc { margin-left: auto; display: flex; gap: 8px; padding-bottom: 9px; }
+  .wc i { width: 11px; height: 11px; border-radius: 50%; background: rgba(16,35,26,.16); }
+
+  .bar {
+    display: flex; align-items: center; gap: 11px;
+    height: 44px; margin-top: 10px; padding: 0 7px 0 7px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.86);
+    box-shadow: 0 1px 2px rgba(16,35,26,.07), 0 6px 20px rgba(16,35,26,.07);
+  }
+  .badge {
+    display: grid; place-items: center; width: 30px; height: 30px;
+    border-radius: 9px;
+    background: linear-gradient(160deg, color-mix(in srgb, var(--tint) 34%, #fff), color-mix(in srgb, var(--tint) 12%, #fff));
+    color: var(--tint);
+  }
+  .badge svg { width: 16px; height: 16px; fill: currentColor; }
+  .url { flex: 1; min-width: 0; font-size: 15px; letter-spacing: -0.015em; }
+  .url b { font-weight: 700; color: #10231a; }
+  .url span { color: #93a89c; font-weight: 500; }
+  .keys { display: flex; align-items: center; gap: 7px; padding-right: 6px; }
+  kbd {
+    font: 600 10.5px/1 "Plus Jakarta Sans";
+    padding: 4px 7px; border-radius: 6px;
+    background: var(--tint-wash); color: #3f6f53;
+  }
+  .keys em { font-style: normal; font-size: 11px; color: #93a89c; }
+
+  /* ---- page ------------------------------------------------------------- */
+  .page { flex: 1; overflow: hidden; padding: 44px 60px; }
+  .brandrow { display: flex; align-items: center; gap: 11px; margin-bottom: 34px; }
+  .logo {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: linear-gradient(150deg, var(--tint), color-mix(in srgb, var(--tint) 55%, #0b3d24));
+  }
+  .brandrow b { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+  .page h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.03em; margin: 0 0 12px; max-width: 560px; line-height: 1.18; }
+  .page p { max-width: 540px; color: #5a7266; margin: 0 0 26px; }
+  .cta { display: inline-flex; align-items: center; gap: 9px; height: 42px; padding: 0 20px; border-radius: 11px; background: var(--tint); color: #fff; font-weight: 600; font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 40px; max-width: 640px; }
+  .cell { padding: 16px; border-radius: 12px; background: var(--tint-wash); }
+  .cell b { display: block; font-size: 23px; font-weight: 700; letter-spacing: -0.02em; }
+  .cell span { font-size: 12px; color: #6b8577; }
+</style>
+</head>
+<body>
+  <div class="chrome">
+    <div class="toprow">
+      <div class="tab on"><span class="fav" style="background:linear-gradient(135deg,#4ade80,#15803d)"></span>Verdant — grow anything</div>
+      <div class="tab"><span class="fav" style="background:linear-gradient(135deg,#93c5fd,#2563eb)"></span>mullvad.net</div>
+      <div class="tab"><span class="fav" style="background:linear-gradient(135deg,#fca5a5,#dc2626)"></span>oakline.press</div>
+      <div class="newtab">+</div>
+      <div class="wc"><i></i><i></i><i></i></div>
+    </div>
+
+    <div class="bar">
+      <div class="badge">
+        <svg viewBox="0 0 16 16"><path d="M8 1.8l5 1.9v4c0 3-2.1 5.3-5 6.5-2.9-1.2-5-3.5-5-6.5v-4z"/></svg>
+      </div>
+      <div class="url"><b>verdant.garden</b><span>/guides/first-season</span></div>
+      <div class="keys"><em>press</em> <kbd>?</kbd> <em>for keys</em></div>
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="brandrow"><div class="logo"></div><b>Verdant</b></div>
+    <h1>Everything you plant this year, in one calm place.</h1>
+    <p>
+      Track a bed from seed to harvest without a spreadsheet. Verdant learns your
+      frost dates, then quietly tells you what to do this week — and nothing else.
+    </p>
+    <div class="cta">Start a garden</div>
+    <div class="grid">
+      <div class="cell"><b>Apr 14</b><span>last frost, your zone</span></div>
+      <div class="cell"><b>6 beds</b><span>tracked this season</span></div>
+      <div class="cell"><b>21 days</b><span>to first harvest</span></div>
+    </div>
+  </div>
+</body>
+</html>

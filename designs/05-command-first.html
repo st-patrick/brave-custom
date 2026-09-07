@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Command First — browser chrome direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<script type="application/json" id="design-meta">
+{
+  "id": "05-command-first",
+  "title": "Command First",
+  "direction": "There is no chrome. A hairline of state, and ⌘K is the browser — tabs, history, navigation, actions.",
+  "medium": "browser-chrome",
+  "theme": "dark",
+  "refs": ["26716139", "26721578"],
+  "tags": ["command-palette", "keyboard-native", "chromeless", "overlay", "hotkey-legend"],
+  "architecture": "overlay mode: chrome view expands to the whole window, palette paints, page dims behind"
+}
+</script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font: 14px/1.55 "IBM Plex Sans", system-ui, sans-serif;
+    background: #08080a; color: #ededf2;
+    overflow: hidden;
+  }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+  /* ---- page, nearly full-bleed ------------------------------------------ */
+  .page {
+    position: absolute; inset: 0;
+    background: #fbfbf9; color: #17171a;
+    padding: 52px 64px;
+    filter: brightness(0.42) saturate(0.6);
+  }
+  .page h1 { font: 600 30px/1.2 "IBM Plex Sans"; letter-spacing: -0.02em; margin: 0 0 26px; }
+  .page .row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #e8e7e3; max-width: 720px; }
+  .page .row b { font-weight: 500; }
+  .page .row span { color: #86857e; font-size: 13px; }
+
+  /* ---- the hairline: the only permanent chrome --------------------------- */
+  .hairline {
+    position: absolute; top: 0; left: 0; right: 0; height: 26px;
+    display: flex; align-items: center; gap: 14px;
+    padding: 0 14px;
+    background: #0b0b0e; border-bottom: 1px solid #191920;
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: #5b5b68;
+    z-index: 3;
+  }
+  .hairline .host { color: #e5e5ec; }
+  .hairline .sec { color: #4d9a71; }
+  .hairline .right { margin-left: auto; display: flex; gap: 14px; }
+  .hairline .blocked { color: #f0653a; }
+
+  /* ---- palette ----------------------------------------------------------- */
+  .scrim { position: absolute; inset: 0; background: rgba(4,4,6,.62); z-index: 4; }
+
+  .palette {
+    position: absolute; z-index: 5;
+    top: 84px; left: 50%; transform: translateX(-50%);
+    width: 640px; max-height: calc(100% - 150px);
+    display: flex; flex-direction: column;
+    border-radius: 14px; overflow: hidden;
+    background: #101015;
+    border: 1px solid #23232d;
+    box-shadow: 0 30px 90px rgba(0,0,0,.62);
+  }
+
+  .pinput {
+    display: flex; align-items: center; gap: 11px;
+    height: 52px; padding: 0 16px;
+    border-bottom: 1px solid #1c1c24;
+    font-size: 15px;
+  }
+  .pinput svg { width: 15px; height: 15px; stroke: #5b5b68; fill: none; stroke-width: 1.7; }
+  .pinput .caret { color: #ededf2; }
+  .pinput .caret i { display: inline-block; width: 1px; height: 17px; background: #f0653a; vertical-align: -3px; margin-left: 1px; animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .pinput .mode { margin-left: auto; font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: #5b5b68; padding: 3px 7px; border-radius: 5px; background: #17171e; }
+
+  .plist { overflow: hidden; padding: 8px 0; }
+  .sect { font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #4a4a56; padding: 10px 16px 6px; }
+  .item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 8px 16px; font-size: 13.5px; color: #b9b9c6;
+  }
+  .item .ico { width: 17px; height: 17px; border-radius: 5px; flex: none; }
+  .item .t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item .t em { font-style: normal; color: #64646f; }
+  .item .k { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: #5b5b68; }
+  .item.on { background: #1a1a22; color: #fff; box-shadow: inset 2px 0 0 #f0653a; }
+
+  /* The legend footer — lifted straight from the reference, and the whole
+     reason this direction works without any buttons. */
+  .pfoot {
+    display: flex; align-items: center; gap: 18px;
+    height: 38px; padding: 0 16px;
+    border-top: 1px solid #1c1c24; background: #0c0c11;
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: #5b5b68;
+  }
+  .pfoot b { color: #c5c5d2; font-weight: 500; }
+  .pfoot .last { margin-left: auto; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1>Downloads</h1>
+    <div class="row"><b>mullvad-app-2026.4.exe</b><span>92.1 MB · 2 min ago</span></div>
+    <div class="row"><b>electron-v38.8.6-win32-x64.zip</b><span>136 MB · 1 h ago</span></div>
+    <div class="row"><b>oakline-field-notes.epub</b><span>1.2 MB · yesterday</span></div>
+    <div class="row"><b>easylist.txt</b><span>2.8 MB · yesterday</span></div>
+  </div>
+
+  <div class="hairline">
+    <span class="sec">https</span>
+    <span class="host">lobste.rs</span>
+    <span>/t/programming</span>
+    <span class="right">
+      <span class="blocked">4 blocked</span>
+      <span>mullvad · doh</span>
+      <span>7 tabs</span>
+    </span>
+  </div>
+
+  <div class="scrim"></div>
+
+  <div class="palette">
+    <div class="pinput">
+      <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.6"/><path d="M10.5 10.5L14 14"/></svg>
+      <span class="caret">mull<i></i></span>
+      <span class="mode">everything</span>
+    </div>
+
+    <div class="plist">
+      <div class="sect">Open tabs</div>
+      <div class="item on">
+        <span class="ico" style="background:linear-gradient(135deg,#60a5fa,#2563eb)"></span>
+        <span class="t">Mullvad VPN — encrypted DNS <em>· mullvad.net/help/dns</em></span>
+        <span class="k">↵</span>
+      </div>
+      <div class="item">
+        <span class="ico" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)"></span>
+        <span class="t">Lobsters — programming <em>· lobste.rs/t/programming</em></span>
+        <span class="k">⌘3</span>
+      </div>
+
+      <div class="sect">History</div>
+      <div class="item">
+        <span class="ico" style="background:#26262f"></span>
+        <span class="t">Why your DNS resolver sees less than you think <em>· 4 days ago</em></span>
+      </div>
+      <div class="item">
+        <span class="ico" style="background:#26262f"></span>
+        <span class="t">adblock.dns.mullvad.net — DoH endpoint list <em>· last week</em></span>
+      </div>
+
+      <div class="sect">Actions</div>
+      <div class="item">
+        <span class="ico" style="background:linear-gradient(135deg,#f0653a,#c2410c)"></span>
+        <span class="t">Switch resolver to Mullvad</span>
+        <span class="k">⌘⇧D</span>
+      </div>
+      <div class="item">
+        <span class="ico" style="background:linear-gradient(135deg,#f0653a,#c2410c)"></span>
+        <span class="t">Search mullvad.net for “<em>mull</em>”</span>
+        <span class="k">⇥</span>
+      </div>
+    </div>
+
+    <div class="pfoot">
+      <span><b>↑↓</b> select</span>
+      <span><b>↵</b> open</span>
+      <span><b>⌘↵</b> new tab</span>
+      <span><b>⇥</b> search site</span>
+      <span class="last"><b>esc</b> close</span>
+    </div>
+  </div>
+</body>
+</html>

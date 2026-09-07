@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Quiet Rail — browser chrome direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400&display=swap" rel="stylesheet" />
+<script type="application/json" id="design-meta">
+{
+  "id": "03-quiet-rail",
+  "title": "Quiet Rail",
+  "direction": "Arc-style vertical rail, stripped of Arc's density. Airy, hostname-only, one accent.",
+  "medium": "browser-chrome",
+  "theme": "light",
+  "refs": ["26757244"],
+  "tags": ["sidebar", "vertical-tabs", "airy", "light", "hostname-only"],
+  "architecture": "the layout mode already built — chrome view docked left, page inset to the right"
+}
+</script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex;
+    font: 14px/1.55 Inter, system-ui, sans-serif;
+    background: #f4f3f0; color: #1c1b19;
+    overflow: hidden;
+  }
+
+  /* ---- rail ------------------------------------------------------------- */
+  .rail {
+    flex: none; width: 252px;
+    display: flex; flex-direction: column;
+    padding: 14px 12px;
+    background: #f4f3f0;
+  }
+  .wc { display: flex; gap: 7px; padding: 2px 4px 16px; }
+  .wc i { width: 11px; height: 11px; border-radius: 50%; background: #dedcd6; }
+
+  .search {
+    display: flex; align-items: center; gap: 8px;
+    height: 36px; padding: 0 12px; margin-bottom: 18px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #e6e4de;
+    color: #a3a19a; font-size: 13px;
+  }
+  .search svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+  .search .k {
+    margin-left: auto; font-size: 10.5px; color: #b6b4ac;
+    padding: 2px 6px; border-radius: 5px; background: #f4f3f0;
+  }
+
+  .label {
+    font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase;
+    color: #b2b0a8; padding: 0 6px 8px;
+  }
+
+  .tab {
+    display: flex; align-items: center; gap: 10px;
+    height: 34px; padding: 0 10px; margin-bottom: 2px;
+    border-radius: 9px; color: #56544e; font-size: 13.5px;
+    white-space: nowrap; overflow: hidden;
+  }
+  .tab .fav { width: 15px; height: 15px; border-radius: 4px; flex: none; }
+  .tab.on { background: #fff; color: #1c1b19; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+  .tab.on .bar { margin-left: auto; width: 3px; height: 15px; border-radius: 2px; background: #c2410c; }
+
+  .pins { display: flex; gap: 6px; padding: 0 4px 18px; }
+  .pins i { width: 30px; height: 30px; border-radius: 8px; }
+
+  .railfoot { margin-top: auto; padding: 12px 6px 2px; border-top: 1px solid #e6e4de; }
+  .keyline { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #a3a19a; }
+  kbd {
+    font: 500 10.5px/1 Inter; padding: 3px 6px; border-radius: 5px;
+    background: #fff; border: 1px solid #e6e4de; color: #6b6963;
+  }
+
+  /* ---- page ------------------------------------------------------------- */
+  .page {
+    flex: 1; margin: 10px 10px 10px 0;
+    border-radius: 14px; background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    overflow: hidden; padding: 46px 62px;
+  }
+  .page .eyebrow { font-size: 11.5px; letter-spacing: 0.09em; text-transform: uppercase; color: #c2410c; }
+  .page h1 { font: 400 36px/1.2 Newsreader, Georgia, serif; margin: 14px 0 10px; letter-spacing: -0.01em; }
+  .page .meta { color: #8d8b84; font-size: 13px; margin-bottom: 30px; }
+  .page p { max-width: 610px; color: #34332f; margin: 0 0 16px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 34px; max-width: 610px; }
+  .card { padding: 14px; border-radius: 10px; background: #faf9f6; border: 1px solid #eeece6; }
+  .card b { display: block; font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
+  .card span { font-size: 11.5px; color: #8d8b84; }
+</style>
+</head>
+<body>
+  <aside class="rail">
+    <div class="wc"><i></i><i></i><i></i></div>
+
+    <div class="search">
+      <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+      Search or enter address
+      <span class="k">⌘L</span>
+    </div>
+
+    <div class="pins">
+      <i style="background:#e8f0fb"></i>
+      <i style="background:#fdeee8"></i>
+      <i style="background:#eaf5ee"></i>
+      <i style="background:#f3eefb"></i>
+    </div>
+
+    <div class="label">Open</div>
+    <div class="tab on"><span class="fav" style="background:linear-gradient(135deg,#f97316,#c2410c)"></span>oakline.press<span class="bar"></span></div>
+    <div class="tab"><span class="fav" style="background:linear-gradient(135deg,#60a5fa,#2563eb)"></span>mullvad.net</div>
+    <div class="tab"><span class="fav" style="background:linear-gradient(135deg,#34d399,#059669)"></span>sourcehut.org</div>
+    <div class="tab"><span class="fav" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)"></span>lobste.rs</div>
+    <div class="tab"><span class="fav" style="background:linear-gradient(135deg,#fbbf24,#d97706)"></span>electronjs.org</div>
+
+    <div class="railfoot">
+      <div class="keyline"><kbd>?</kbd> shortcuts <kbd>⌘⇧E</kbd> layout</div>
+    </div>
+  </aside>
+
+  <main class="page">
+    <div class="eyebrow">Field notes</div>
+    <h1>The quiet return of the small, slow website</h1>
+    <div class="meta">Marta Bexell · 9 min read · September 2026</div>
+    <p>
+      Somewhere between the third cookie banner and the fourth newsletter modal, a
+      certain kind of reader gave up. Not on reading — on the machinery around it.
+      What has grown back in the gap is smaller and stranger than anyone expected.
+    </p>
+    <p>
+      The sites are hand-made and frequently ugly. They load in under a second on a
+      train. They are maintained by one person who answers their own email.
+    </p>
+    <div class="cards">
+      <div class="card"><b>0.4s</b><span>median load</span></div>
+      <div class="card"><b>12</b><span>trackers blocked</span></div>
+      <div class="card"><b>38kB</b><span>page weight</span></div>
+    </div>
+  </main>
+</body>
+</html>

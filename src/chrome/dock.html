@@ -1,0 +1,264 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>dock</title>
+    <link rel="stylesheet" href="tokens.css" />
+    <style>
+      /* Two states in one view. Collapsed, the body IS the small dock rect at
+         the bottom of the window. When the palette opens, main resizes this
+         view to the whole window and .overlay takes over. */
+      body {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+      }
+
+      /* -- the pill --------------------------------------------------------- */
+      .dock {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 22px;
+        width: 100%;
+      }
+      body.palette .dock { display: none; }
+
+      .legend {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 7px 13px;
+        border-radius: var(--r);
+        background: rgb(14 14 18 / 0.96);
+        border: 1px solid rgb(255 255 255 / 0.08);
+        font-size: 11px;
+        color: var(--dim);
+        opacity: 0;
+        transform: translateY(4px);
+        transition: opacity 0.14s ease, transform 0.14s ease;
+        white-space: nowrap;
+      }
+      body.hover .legend { opacity: 1; transform: none; }
+
+      .pill {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        height: 46px;
+        padding: 0 7px 0 7px;
+        border-radius: var(--pill);
+        width: 100%;
+        max-width: 520px;
+        /* No backdrop-filter: this is its own WebContentsView, so it cannot
+           sample the page behind it -- the blur would composite against
+           nothing. A near-solid surface is the honest version of the effect. */
+        background: rgb(14 14 18 / 0.96);
+        border: 1px solid rgb(255 255 255 / 0.10);
+        box-shadow: var(--shadow-pill);
+        -webkit-app-region: no-drag;
+      }
+
+      .shield {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        height: 32px;
+        padding: 0 10px 0 8px;
+        border-radius: var(--pill);
+        background: rgb(255 255 255 / 0.06);
+        color: var(--secure);
+        font: 600 11.5px/1 var(--sans);
+        flex: none;
+      }
+      .shield svg { width: 13px; height: 13px; fill: currentColor; }
+      .shield.blocking { color: var(--accent); }
+      .shield .n:empty { display: none; }
+
+      .addr {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: baseline;
+        gap: 1px;
+        font-size: 13.5px;
+        letter-spacing: -0.005em;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .addr .host { font-weight: 600; color: var(--fg); flex: none; }
+      .addr .path {
+        color: var(--faint);
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .addr .placeholder { color: var(--faint); font-weight: 400; }
+
+      .count {
+        display: grid;
+        place-items: center;
+        min-width: 32px;
+        height: 32px;
+        padding: 0 10px;
+        border-radius: var(--pill);
+        background: var(--fg);
+        color: var(--bg);
+        font: 600 12px/1 var(--sans);
+        flex: none;
+      }
+
+      /* -- overlay: scrim + palette -----------------------------------------
+         The state flag on <body> is `palette`, NOT `overlay`: `.overlay` is the
+         container's own class, and a matching class on <body> would make body
+         itself match `.overlay { display: none }`. */
+      .overlay { position: fixed; inset: 0; display: none; }
+      body.palette .overlay { display: block; }
+
+      .scrim { position: absolute; inset: 0; background: rgb(4 4 6 / 0.62); }
+
+      .panel {
+        position: absolute;
+        top: 78px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(660px, calc(100% - 64px));
+        max-height: calc(100% - 150px);
+        display: flex;
+        flex-direction: column;
+        border-radius: var(--r-lg);
+        overflow: hidden;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow-panel);
+      }
+
+      .query {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        height: 54px;
+        padding: 0 16px;
+        border-bottom: 1px solid var(--panel-2);
+        flex: none;
+      }
+      .query svg { width: 15px; height: 15px; stroke: var(--faint); fill: none; stroke-width: 1.7; flex: none; }
+      .query input {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--fg);
+        font: 400 15px/1 var(--sans);
+        user-select: text;
+        cursor: text;
+      }
+      .query input::placeholder { color: var(--faint); }
+      .mode {
+        font: 400 10.5px/1 var(--mono);
+        color: var(--faint);
+        padding: 4px 7px;
+        border-radius: var(--r-sm);
+        background: var(--panel-2);
+        flex: none;
+      }
+
+      .results { overflow-y: auto; padding: 6px 0 8px; flex: 1; }
+      .results::-webkit-scrollbar { width: 9px; }
+      .results::-webkit-scrollbar-thumb { background: #26262f; border-radius: 5px; border: 3px solid var(--panel); }
+
+      .sect {
+        font: 400 10px/1 var(--mono);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ghost);
+        padding: 11px 16px 6px;
+      }
+
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 8px 16px;
+        font-size: 13.5px;
+        color: var(--dim);
+      }
+      .item .ico {
+        width: 17px;
+        height: 17px;
+        border-radius: 5px;
+        flex: none;
+        background: #24242d;
+        object-fit: contain;
+      }
+      .item .t { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .item .t em { font-style: normal; color: var(--ghost); }
+      .item .k { font: 400 10.5px/1 var(--mono); color: var(--faint); flex: none; }
+      .item.on { background: var(--hover); color: var(--fg); box-shadow: inset 2px 0 0 var(--accent); }
+      .empty { padding: 26px 16px; text-align: center; color: var(--ghost); font-size: 12.5px; }
+
+      .foot {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+        height: 38px;
+        padding: 0 16px;
+        border-top: 1px solid var(--panel-2);
+        background: #0c0c11;
+        font: 400 10.5px/1 var(--mono);
+        color: var(--faint);
+        flex: none;
+      }
+      .foot b { color: var(--dim); font-weight: 500; }
+      .foot .last { margin-left: auto; }
+
+      /* -- shortcuts sheet --------------------------------------------------- */
+      .keys { padding: 6px 0 10px; overflow-y: auto; }
+      .keys table { width: 100%; border-collapse: collapse; }
+      .keys td { padding: 7px 16px; font-size: 13px; color: var(--dim); vertical-align: baseline; }
+      .keys td:first-child { width: 168px; white-space: nowrap; }
+      .keys tr + tr td { border-top: 1px solid #17171e; }
+      .keys .grp td { color: var(--ghost); font: 400 10px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; padding-top: 15px; }
+    </style>
+  </head>
+  <body>
+    <div class="dock">
+      <div class="legend" id="legend"></div>
+
+      <div class="pill" id="pill">
+        <div class="shield" id="shield">
+          <svg viewBox="0 0 16 16"><path d="M8 1.8l5 1.9v4c0 3-2.1 5.3-5 6.5-2.9-1.2-5-3.5-5-6.5v-4z" /></svg>
+          <span class="n" id="blocked"></span>
+        </div>
+        <div class="addr" id="addr"><span class="placeholder">Search, or type a URL</span></div>
+        <div class="count" id="count">1</div>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay">
+      <div class="scrim" id="scrim"></div>
+      <div class="panel">
+        <div class="query">
+          <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.6" /><path d="M10.5 10.5L14 14" /></svg>
+          <input id="q" spellcheck="false" autocomplete="off" placeholder="Search tabs, history, actions — or type a URL" />
+          <span class="mode" id="mode">everything</span>
+        </div>
+
+        <div class="results" id="results"></div>
+
+        <div class="keys" id="keysheet" hidden></div>
+
+        <div class="foot" id="foot">
+          <span><b>↑↓</b> select</span>
+          <span><b>↵</b> open</span>
+          <span><b>⌘↵</b> new tab</span>
+          <span class="last"><b>esc</b> close</span>
+        </div>
+      </div>
+    </div>
+
+    <script src="dock.js"></script>
+  </body>
+</html>

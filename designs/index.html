@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Browser chrome — directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0d0d10;
+    --card: #141419;
+    --line: #22222b;
+    --fg: #ececf2;
+    --dim: #8c8c9a;
+    --faint: #5a5a67;
+    --accent: #f0653a;
+    --w: 1320;   /* the viewport each design is composed for */
+    --h: 900;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 14px/1.6 Inter, system-ui, sans-serif;
+    padding: 44px 40px 70px;
+  }
+  header { max-width: 1500px; margin: 0 auto 34px; }
+  h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.025em; margin: 0 0 8px; }
+  header p { color: var(--dim); margin: 0; max-width: 660px; }
+  header .keys { margin-top: 14px; font: 400 11.5px/1 "JetBrains Mono", monospace; color: var(--faint); }
+
+  .grid {
+    max-width: 1500px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 22px;
+  }
+
+  .card {
+    border: 1px solid var(--line); border-radius: 13px; overflow: hidden;
+    background: var(--card); text-decoration: none; color: inherit;
+    display: block; transition: border-color .15s ease, transform .15s ease;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+  .shot { position: relative; width: 100%; aspect-ratio: var(--w) / var(--h); overflow: hidden; background: #000; }
+  .shot iframe {
+    position: absolute; top: 0; left: 0;
+    width: calc(var(--w) * 1px); height: calc(var(--h) * 1px);
+    border: 0; transform-origin: 0 0; pointer-events: none;
+  }
+
+  .meta { padding: 15px 17px 17px; border-top: 1px solid var(--line); }
+  .meta .n { font: 500 10.5px/1 "JetBrains Mono", monospace; color: var(--faint); }
+  .meta h2 { font-size: 16px; font-weight: 600; letter-spacing: -0.015em; margin: 7px 0 6px; }
+  .meta p { color: var(--dim); font-size: 12.8px; margin: 0 0 11px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tags span {
+    font: 500 10.5px/1 "JetBrains Mono", monospace; color: var(--faint);
+    padding: 4px 7px; border-radius: 5px; background: #1c1c23;
+  }
+  .arch {
+    margin-top: 11px; padding-top: 11px; border-top: 1px solid var(--line);
+    font-size: 11.5px; color: var(--faint); line-height: 1.5;
+  }
+  .arch b { color: var(--dim); font-weight: 500; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Browser chrome — five directions</h1>
+    <p>
+      Each one is a single self-contained HTML file showing the frame around a real page,
+      not a mockup on a stage. Click any card to open it full size.
+    </p>
+    <div class="keys">brave-custom/designs · refs pulled from dribbble into ../refs</div>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+<script>
+const DESIGNS = [
+  {
+    "id": "01-floating-pill",
+    "title": "Floating Pill",
+    "direction": "Safari 26. The chrome is one floating pill over a full-bleed page. No visible buttons at all.",
+    "medium": "browser-chrome",
+    "theme": "light",
+    "refs": [
+      "27248035"
+    ],
+    "tags": [
+      "floating",
+      "glass",
+      "minimal",
+      "full-bleed",
+      "hotkey-legend"
+    ],
+    "architecture": "chrome view is a small rect docked bottom-centre; the page view fills the whole window behind it",
+    "file": "01-floating-pill.html"
+  },
+  {
+    "id": "02-hotkey-hud",
+    "title": "Hotkey HUD",
+    "direction": "The tack idea taken all the way: no clickable toolbar at all, a persistent legend of keys instead.",
+    "medium": "browser-chrome",
+    "theme": "dark",
+    "refs": [
+      "26716139"
+    ],
+    "tags": [
+      "mono",
+      "dense",
+      "keyboard-first",
+      "terminal",
+      "hotkey-legend"
+    ],
+    "architecture": "top strip, same as today \u2014 but the second row is a legend, not buttons",
+    "file": "02-hotkey-hud.html"
+  },
+  {
+    "id": "03-quiet-rail",
+    "title": "Quiet Rail",
+    "direction": "Arc-style vertical rail, stripped of Arc's density. Airy, hostname-only, one accent.",
+    "medium": "browser-chrome",
+    "theme": "light",
+    "refs": [
+      "26757244"
+    ],
+    "tags": [
+      "sidebar",
+      "vertical-tabs",
+      "airy",
+      "light",
+      "hostname-only"
+    ],
+    "architecture": "the layout mode already built \u2014 chrome view docked left, page inset to the right",
+    "file": "03-quiet-rail.html"
+  },
+  {
+    "id": "04-tinted-frame",
+    "title": "Tinted Frame",
+    "direction": "The chrome adopts the page's theme-colour. Soft gradient tab pills, hostname/path split in the URL.",
+    "medium": "browser-chrome",
+    "theme": "light",
+    "refs": [
+      "27248035"
+    ],
+    "tags": [
+      "adaptive",
+      "soft",
+      "gradient",
+      "theme-color",
+      "playful"
+    ],
+    "architecture": "read <meta name=theme-color> per tab, push it to the chrome UI as a CSS variable",
+    "file": "04-tinted-frame.html"
+  },
+  {
+    "id": "05-command-first",
+    "title": "Command First",
+    "direction": "There is no chrome. A hairline of state, and \u2318K is the browser \u2014 tabs, history, navigation, actions.",
+    "medium": "browser-chrome",
+    "theme": "dark",
+    "refs": [
+      "26716139",
+      "26721578"
+    ],
+    "tags": [
+      "command-palette",
+      "keyboard-native",
+      "chromeless",
+      "overlay",
+      "hotkey-legend"
+    ],
+    "architecture": "overlay mode: chrome view expands to the whole window, palette paints, page dims behind",
+    "file": "05-command-first.html"
+  }
+]
+
+const grid = document.getElementById('grid')
+
+DESIGNS.forEach((m, i) => {
+  const card = document.createElement('a')
+  card.className = 'card'
+  card.href = m.file
+  card.target = '_blank'
+  card.innerHTML =
+    '<div class="shot"><iframe src="' + m.file + '" scrolling="no"></iframe></div>' +
+    '<div class="meta">' +
+      '<div class="n">' + String(i + 1).padStart(2, '0') + ' · ' + m.theme + '</div>' +
+      '<h2>' + m.title + '</h2>' +
+      '<p>' + m.direction + '</p>' +
+      '<div class="tags">' + (m.tags || []).map(t => '<span>' + t + '</span>').join('') + '</div>' +
+      (m.architecture ? '<div class="arch"><b>build:</b> ' + m.architecture + '</div>' : '') +
+    '</div>'
+  grid.appendChild(card)
+
+  // Scale the live iframe down to the card width.
+  const shot = card.querySelector('.shot')
+  const frame = card.querySelector('iframe')
+  const fit = () => {
+    frame.style.transform = 'scale(' + shot.clientWidth / 1320 + ')'
+  }
+  fit()
+  new ResizeObserver(fit).observe(shot)
+
+})
+</script>
+</body>
+</html>

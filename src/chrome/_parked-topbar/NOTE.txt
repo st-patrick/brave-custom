@@ -1,0 +1,4 @@
+The horizontal tab-bar / vertical-sidebar UI, parked when the floating-pill +
+command-palette direction was chosen. Nothing loads these; kept because they are
+a complete, working chrome UI and a useful thing to diff the new one against.
+To run it again, point chromeView at index.html and restore the old applyLayout.

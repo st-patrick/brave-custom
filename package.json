@@ -1,0 +1,14 @@
+{
+  "name": "brave-custom",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A browser shell whose entire UI is yours to redesign",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "devDependencies": {
+    "electron": "^38.0.0"
+  }
+}

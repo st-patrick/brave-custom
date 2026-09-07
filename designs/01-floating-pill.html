@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Floating Pill — browser chrome direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet" />
+<script type="application/json" id="design-meta">
+{
+  "id": "01-floating-pill",
+  "title": "Floating Pill",
+  "direction": "Safari 26. The chrome is one floating pill over a full-bleed page. No visible buttons at all.",
+  "medium": "browser-chrome",
+  "theme": "light",
+  "refs": ["27248035"],
+  "tags": ["floating", "glass", "minimal", "full-bleed", "hotkey-legend"],
+  "architecture": "chrome view is a small rect docked bottom-centre; the page view fills the whole window behind it"
+}
+</script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font: 15px/1.6 Inter, system-ui, sans-serif;
+    color: #17171b;
+    background: #fbfbfa;
+    overflow: hidden;
+  }
+
+  /* ---- the page, full-bleed edge to edge -------------------------------- */
+  .page { position: absolute; inset: 0; overflow: hidden; }
+
+  .masthead {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 26px 56px;
+    border-bottom: 1px solid #e9e7e2;
+  }
+  .wordmark { font: 600 17px/1 Inter; letter-spacing: -0.02em; }
+  .wordmark span { color: #c2410c; }
+  .masthead nav { display: flex; gap: 26px; font-size: 13px; color: #6b6a66; }
+
+  article { max-width: 660px; margin: 0 auto; padding: 58px 24px 0; }
+  .kicker { font: 600 11.5px/1 Inter; letter-spacing: 0.1em; text-transform: uppercase; color: #c2410c; }
+  h1 {
+    font: 400 42px/1.15 Newsreader, Georgia, serif;
+    letter-spacing: -0.015em;
+    margin: 16px 0 14px;
+  }
+  .byline { color: #86847e; font-size: 13px; margin-bottom: 30px; }
+  article p { color: #33322e; margin: 0 0 17px; }
+  article p:first-of-type::first-letter {
+    float: left; font: 400 58px/0.82 Newsreader, serif;
+    padding: 4px 9px 0 0; color: #c2410c;
+  }
+  .figure {
+    height: 190px; margin: 26px 0; border-radius: 10px;
+    background:
+      radial-gradient(120% 140% at 15% 0%, #fed7aa 0%, transparent 55%),
+      radial-gradient(100% 120% at 90% 100%, #bfdbfe 0%, transparent 55%),
+      linear-gradient(120deg, #f5f3ee, #e8e4dc);
+  }
+
+  /* ---- the chrome: one pill, floating ----------------------------------- */
+  .dock {
+    position: absolute; left: 50%; bottom: 26px;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    width: max-content;
+  }
+
+  /* The hotkey legend replaces a row of buttons. It is the only "toolbar". */
+  .legend {
+    display: flex; align-items: center; gap: 16px;
+    padding: 8px 15px;
+    border-radius: 12px;
+    background: rgba(28, 28, 32, 0.86);
+    backdrop-filter: blur(14px);
+    color: #d6d5d0;
+    font-size: 11.5px;
+    box-shadow: 0 10px 34px rgba(20, 20, 25, 0.22);
+  }
+  .legend b { color: #fff; font-weight: 500; }
+  kbd {
+    font: 500 10.5px/1 Inter; letter-spacing: 0.01em;
+    padding: 3.5px 6px; border-radius: 5px;
+    background: rgba(255, 255, 255, 0.13);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    color: #fff;
+  }
+
+  .pill {
+    display: flex; align-items: center; gap: 11px;
+    height: 46px; padding: 0 7px 0 8px;
+    border-radius: 23px;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(22px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 14px 44px rgba(20, 20, 25, 0.17);
+    min-width: 430px;
+  }
+  .shield {
+    display: flex; align-items: center; gap: 5px;
+    height: 30px; padding: 0 9px 0 7px; border-radius: 15px;
+    background: #f0efec;
+    color: #4b7a5c; font: 600 11.5px/1 Inter;
+  }
+  .shield svg { width: 13px; height: 13px; fill: currentColor; }
+  .host { flex: 1; font-size: 13.5px; letter-spacing: -0.005em; }
+  .host b { font-weight: 600; }
+  .host span { color: #9b9992; }
+  .count {
+    display: grid; place-items: center;
+    min-width: 30px; height: 30px; padding: 0 9px;
+    border-radius: 15px; background: #17171b; color: #fff;
+    font: 600 12px/1 Inter;
+  }
+
+  .hint { font-size: 11px; color: #a9a7a0; letter-spacing: 0.01em; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <div class="wordmark">Oakline<span>.</span></div>
+      <nav><span>Reporting</span><span>Field notes</span><span>Archive</span><span>About</span></nav>
+    </header>
+
+    <article>
+      <div class="kicker">Field notes</div>
+      <h1>The quiet return of the small, slow website</h1>
+      <div class="byline">Marta Bexell · 9 min read · September 2026</div>
+      <p>
+        Somewhere between the third cookie banner and the fourth newsletter modal, a
+        certain kind of reader gave up. Not on reading — on the machinery around it.
+        What has grown back in the gap is smaller and stranger than anyone expected.
+      </p>
+      <div class="figure"></div>
+      <p>
+        The sites are hand-made and frequently ugly. They load in under a second on a
+        train. They are maintained by one person who answers their own email. None of
+        this is nostalgia; it is a straightforward response to a web that got heavier
+        every year while getting no better at the only thing it was for.
+      </p>
+      <p>
+        What is genuinely new is the tooling underneath. It has never been cheaper to
+        run something small and permanent, and it has never been easier to make it feel
+        considered rather than merely cheap.
+      </p>
+    </article>
+  </div>
+
+  <div class="dock">
+    <div class="legend">
+      <span><kbd>⌘L</kbd> <b>address</b></span>
+      <span><kbd>⌘T</kbd> <b>new tab</b></span>
+      <span><kbd>⌘⇧A</kbd> <b>tabs</b></span>
+      <span><kbd>⌘[</kbd> <b>back</b></span>
+      <span><kbd>?</kbd> <b>all keys</b></span>
+    </div>
+
+    <div class="pill">
+      <div class="shield">
+        <svg viewBox="0 0 16 16"><path d="M8 1.8l5 1.9v4c0 3-2.1 5.3-5 6.5-2.9-1.2-5-3.5-5-6.5v-4z"/></svg>
+        12
+      </div>
+      <div class="host"><b>oakline.press</b><span>/field-notes/small-slow-web</span></div>
+      <div class="count">7</div>
+    </div>
+
+    <div class="hint">the whole toolbar is one pill — everything else is a key</div>
+  </div>
+</body>
+</html>
